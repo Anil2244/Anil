@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - main
+
+jobs:
+- job: BuildAndDeploy
+  displayName: 'Build and Deploy to Azure App Service'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      addToPath: true
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install azure-cli
+    displayName: 'Install Azure CLI'
+
+  - task: AzureWebApp@1
+    displayName: 'Azure Web App Deploy'
+    inputs:
+      azureSubscription: 'Free Trial'
+      appName: 'webappparamesh'
+      package: '$(System.DefaultWorkingDirectory)/*/.zip'
+      runtimeStack: 'Php - 8.2'
+      startupCommand: 'index.php'
